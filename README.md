@@ -55,7 +55,7 @@ This project implements an **event registration system** with the following feat
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:pedro-arruda09/go-notifications-microservice.git
    cd go-notifications-microservice
    ```
 
