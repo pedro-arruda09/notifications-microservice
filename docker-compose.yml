@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - rabbitmq
+    command: npm run dev
+
+  notifications-service:
+    image: golang:1.24.5-alpine
+    container_name: notifications-service
+    env_file:
+      - ./server/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./server:/app
+    working_dir: /app
+    command: go run cmd/main.go
